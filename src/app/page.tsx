@@ -1,5 +1,6 @@
+import { Suspense } from "react";
+import FilterableAnalyses from "@/components/FilterableAnalyses";
 import { createClient } from "@/lib/actions/supabase";
-import AnalysisCard from "@/components/AnalysisCard";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -26,28 +27,14 @@ export default async function Home() {
               Respects privacy
             </p>
           </div>
-
-          {/* Placeholder for future filtering UI */}
-          <div className="text-xs">
-            <p>Filtering options will be available soon</p>
-          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {analyses?.map((analysis) => (
-          <AnalysisCard key={analysis.id} analysis={analysis} />
-        ))}
-      </div>
-
-      {analyses?.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-lg">No analysis documents found</p>
-          <p className="text-sm">
-            The database needs to be populated with analyses first
-          </p>
-        </div>
-      )}
+      <Suspense
+        fallback={<div className="text-center py-8">Loading analyses...</div>}
+      >
+        <FilterableAnalyses initialAnalyses={analyses || []} />
+      </Suspense>
     </main>
   );
 }
