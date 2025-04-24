@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Chivo } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { FaSearch } from "react-icons/fa";
 
 const chivo = Chivo({ subsets: ["latin"] });
 
@@ -20,10 +21,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={chivo.className}>
         <div className="min-h-screen flex flex-col max-w-7xl mx-auto">
-          <header className="bg-card shadow-sm px-4 sm:px-6">
+          <header className="shadow-sm px-4 sm:px-6">
             <div className="py-3 flex justify-between items-center">
               <Link href="/" className="flex items-center">
-                <span className="text-xl mr-1.5">🔍</span>
+                <FaSearch className="mr-1.5" />
                 <span className="font-bold text-lg">Consent Lens</span>
               </Link>
               <nav className="space-x-5">
@@ -36,7 +37,7 @@ export default function RootLayout({
 
           <div className="flex-1">{children}</div>
 
-          <footer className="bg-card shadow-inner mt-8 py-4 px-4 sm:px-6">
+          <footer className="shadow-inner mt-8 py-4 px-4 sm:px-6">
             <div className="text-center text-xs">
               <p>
                 © {new Date().getFullYear()} Consent Lens. Built with ❤️ by{" "}
