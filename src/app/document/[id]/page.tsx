@@ -56,16 +56,11 @@ export default async function DocumentPage({
       <div className="bg-card rounded-lg shadow-sm p-5 max-w-4xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start gap-3 mb-4">
           <div>
-            <h1 className="text-2xl font-bold">{analysis.service_name}</h1>
+            <h1 className="text-2xl font-bold">{analysis.name}</h1>
             <div className="mt-1.5">
               <span className="inline-block bg-muted text-foreground text-xs px-2 py-0.5 rounded">
-                {getDocumentTypeDisplay(analysis.document_type)}
+                {getDocumentTypeDisplay(analysis.type)}
               </span>
-              {analysis.ai_generated && (
-                <span className="inline-block bg-muted text-foreground text-xs px-2 py-0.5 rounded ml-2">
-                  🤖 AI-generated
-                </span>
-              )}
             </div>
           </div>
           <div
