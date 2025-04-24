@@ -14,13 +14,16 @@ function formatDate(dateString: string): string {
 export default async function DocumentPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  // Await params to get the id
+  const { id } = await params;
+
   const supabase = await createClient();
   const { data: analysis } = await supabase
     .from("analyses")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", id)
     .single();
 
   if (!analysis) {
