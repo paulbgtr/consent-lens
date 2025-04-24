@@ -11,12 +11,11 @@ function formatDate(dateString: string): string {
   )}-${String(date.getDate()).padStart(2, "0")}`;
 }
 
-type PageProps = {
+export default async function DocumentPage({
+  params,
+}: {
   params: { id: string };
-  searchParams: Record<string, string | string[] | undefined>;
-};
-
-export default async function DocumentPage({ params }: PageProps) {
+}) {
   const supabase = await createClient();
   const { data: analysis } = await supabase
     .from("analyses")
