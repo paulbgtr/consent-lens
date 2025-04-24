@@ -2,7 +2,14 @@
 
 import React from "react";
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from "@/components/ui/card";
 
 type RiskLevel = "yes" | "no" | "passive" | "limited" | string;
 
@@ -15,13 +22,12 @@ interface Risks {
 
 interface Analysis {
   id: string;
-  service_name: string;
-  document_type: "tos" | "privacy" | "cookie" | "other";
+  name: string;
+  type: "tos" | "privacy" | "cookie" | "other";
   summary: string;
   risks: Risks | string;
   rating: number;
   source_url: string;
-  ai_generated: boolean;
   created_at: string;
 }
 
@@ -242,131 +248,119 @@ export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
       : analysis.risks || {};
 
   const processedRisks = getProcessedRisks(risks);
-  const documentBadge = getDocumentBadge(analysis.document_type);
+  const documentBadge = getDocumentBadge(analysis.type);
   const ratingDisplay = getRatingDisplay(analysis.rating);
 
   return (
     <Link href={`/document/${analysis.id}`} className="block group">
-      <Card className="overflow-hidden h-full transition-all duration-300 border border-muted dark:border-muted group-hover:border-muted dark:group-hover:border-muted group-hover:shadow-sm">
-        <CardContent className="p-0">
-          {/* Card Header Section */}
-          <div className="relative overflow-hidden">
-            {/* Service Brand Bar - Visual Indicator */}
-            <div className={`h-1 w-full ${ratingDisplay.color}`}></div>
+      <Card className="h-full transition-all duration-300 hover:shadow-sm overflow-hidden">
+        {/* Service Brand Bar - Visual Indicator */}
+        <div className={`h-1 w-full ${ratingDisplay.color}`}></div>
 
-            {/* Card Content */}
-            <div className="p-4">
-              <h3 className="font-semibold text-base text-foreground dark:text-foreground">
-                {analysis.service_name}
-              </h3>
+        <CardHeader className="px-4 py-3 gap-1">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">{analysis.name}</CardTitle>
 
-              {/* Document type badge */}
-              <div className="mt-1 mb-2">
-                <span className="bg-muted text-foreground dark:bg-muted dark:text-foreground text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded flex items-center">
-                  <span className="mr-1">{documentBadge.label}</span>
-                  {analysis.ai_generated && (
-                    <span className="ml-1 text-[10px]">• AI</span>
-                  )}
-                </span>
-              </div>
-
-              {/* Summary */}
-              <p className="text-xs text-foreground dark:text-foreground line-clamp-2 mb-3 min-h-[2rem]">
-                {analysis.summary}
-              </p>
-
-              {/* Rating Bar */}
-              <div className="flex justify-between items-center text-xs text-foreground dark:text-foreground mb-1">
-                <div>
-                  <span className="font-medium text-foreground dark:text-foreground text-xs">
-                    {ratingDisplay.label}
-                  </span>
-                  <span className="ml-1 text-[10px]">
-                    ({analysis.rating}/10)
-                  </span>
-                </div>
-              </div>
-
-              <div className="h-1 w-full bg-muted dark:bg-muted rounded-full overflow-hidden">
-                <div
-                  className={`h-full ${ratingDisplay.color} ${ratingDisplay.barWidthClass}`}
-                ></div>
-              </div>
-
-              {/* Risks Section */}
-              <div className="mt-3 space-y-1.5">
-                {processedRisks.map((risk, index) => {
-                  const severityClasses = getSeverityClasses(risk.severity);
-                  return (
-                    <div key={index} className="flex items-center">
-                      <div
-                        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${severityClasses.dotColor}`}
-                      ></div>
-                      <span
-                        className={`text-[10px] font-medium ${severityClasses.textColor}`}
-                      >
-                        {risk.name}: {risk.value}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Source Link */}
-              {analysis.source_url && (
-                <div className="mt-2">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      window.open(
-                        analysis.source_url,
-                        "_blank",
-                        "noopener,noreferrer"
-                      );
-                    }}
-                    className="text-[10px] font-medium text-foreground dark:text-foreground hover:text-foreground dark:hover:text-foreground cursor-pointer flex items-center"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="10"
-                      height="10"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="mr-1"
-                    >
-                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                      <polyline points="15 3 21 3 21 9"></polyline>
-                      <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    Source
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Card Footer */}
-          <div className="px-4 py-2 border-t border-muted dark:border-muted bg-muted dark:bg-muted flex justify-between items-center">
-            <div>
-              <time
-                dateTime={analysis.created_at}
-                className="text-[10px] text-muted-foreground"
-              >
-                {formatDate(analysis.created_at)}
-              </time>
-            </div>
-            <div>
-              <span className="text-[10px] text-muted-foreground">
-                View details →
+            <div className="flex items-center gap-1.5">
+              <span className="bg-muted text-foreground text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded">
+                {documentBadge.label}
               </span>
             </div>
           </div>
+
+          <CardDescription className="line-clamp-2 text-xs">
+            {analysis.summary}
+          </CardDescription>
+        </CardHeader>
+
+        <CardContent className="px-4 py-2 space-y-3">
+          {/* Rating Section */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <span className="font-medium text-xs">
+                  {ratingDisplay.label}
+                </span>
+                <span className="text-[10px] text-muted-foreground">
+                  ({analysis.rating}/10)
+                </span>
+              </div>
+            </div>
+
+            <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+              <div
+                className={`h-full ${ratingDisplay.color} ${ratingDisplay.barWidthClass}`}
+              ></div>
+            </div>
+          </div>
+
+          {/* Top Risks Section */}
+          {processedRisks.length > 0 && (
+            <div className="grid grid-cols-1 gap-1.5">
+              {processedRisks.map((risk, index) => {
+                const severityClasses = getSeverityClasses(risk.severity);
+                return (
+                  <div key={index} className="flex items-center">
+                    <div
+                      className={`w-1.5 h-1.5 rounded-full mr-1.5 ${severityClasses.dotColor}`}
+                    ></div>
+                    <span
+                      className={`text-xs font-medium ${severityClasses.textColor}`}
+                    >
+                      {risk.name}: {risk.value}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Source Link */}
+          {analysis.source_url && (
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.open(
+                  analysis.source_url,
+                  "_blank",
+                  "noopener,noreferrer"
+                );
+              }}
+              className="text-xs font-medium text-foreground hover:underline flex items-center"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="mr-1"
+              >
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              Source
+            </button>
+          )}
         </CardContent>
+
+        <CardFooter className="px-4 py-2 mt-auto border-t border-muted justify-between">
+          <time
+            dateTime={analysis.created_at}
+            className="text-[10px] text-muted-foreground"
+          >
+            {formatDate(analysis.created_at)}
+          </time>
+          <span className="text-[10px] text-muted-foreground">
+            View details →
+          </span>
+        </CardFooter>
       </Card>
     </Link>
   );
