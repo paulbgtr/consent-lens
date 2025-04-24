@@ -38,7 +38,7 @@ We welcome contributions to improve Consent Lens! Whether it's adding new analys
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+This project is open source and available under the [Mozilla Public License Version 2.0](LICENSE).
 
 ## Contact
 
