@@ -48,50 +48,52 @@ export default async function DocumentPage({
       : analysis.risks || {};
 
   return (
-    <main className="container mx-auto py-8 px-4">
-      <Link href="/" className="hover:underline mb-6 inline-block">
+    <main className="px-4 sm:px-6 py-6">
+      <Link href="/" className="hover:underline mb-4 inline-block text-sm">
         ← Back to all documents
       </Link>
 
-      <div className="bg-card rounded-lg shadow-lg p-8 max-w-4xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
+      <div className="bg-card rounded-lg shadow-sm p-5 max-w-4xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-3 mb-4">
           <div>
-            <h1 className="text-3xl font-bold">{analysis.service_name}</h1>
-            <div className="mt-2">
-              <span className="inline-block bg-muted text-foreground text-sm px-3 py-1 rounded">
+            <h1 className="text-2xl font-bold">{analysis.service_name}</h1>
+            <div className="mt-1.5">
+              <span className="inline-block bg-muted text-foreground text-xs px-2 py-0.5 rounded">
                 {getDocumentTypeDisplay(analysis.document_type)}
               </span>
               {analysis.ai_generated && (
-                <span className="inline-block bg-muted text-foreground text-sm px-3 py-1 rounded ml-2">
+                <span className="inline-block bg-muted text-foreground text-xs px-2 py-0.5 rounded ml-2">
                   🤖 AI-generated
                 </span>
               )}
             </div>
           </div>
           <div
-            className={`text-lg font-semibold px-4 py-2 rounded-full ${getRatingColor()}`}
+            className={`text-base font-semibold px-3 py-1.5 rounded-full ${getRatingColor()}`}
           >
             Privacy Rating: {analysis.rating}/10
           </div>
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-3">Summary</h2>
-          <div className="bg-muted p-4 rounded-md">{analysis.summary}</div>
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold mb-2">Summary</h2>
+          <div className="bg-muted p-3 rounded-md text-sm">
+            {analysis.summary}
+          </div>
         </div>
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-3">Key Risks</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold mb-2">Key Risks</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {Object.entries(risks).map(([key, value]) => (
               <div
                 key={key}
-                className="flex items-center p-3 rounded-md bg-muted"
+                className="flex items-center p-2 rounded-md bg-muted"
               >
-                <span className="font-medium capitalize">
+                <span className="font-medium capitalize text-sm">
                   {key.replace(/_/g, " ")}:
                 </span>
-                <span className="ml-2 px-2 py-1 rounded-full text-sm bg-muted">
+                <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-muted">
                   {String(value)}
                 </span>
               </div>
@@ -99,17 +101,19 @@ export default async function DocumentPage({
           </div>
         </div>
 
-        <div className="border-t pt-4 flex justify-between items-center">
+        <div className="border-t pt-3 flex justify-between items-center">
           <div>
-            <p>Added on: {formatDate(analysis.created_at)}</p>
+            <p className="text-xs">
+              Added on: {formatDate(analysis.created_at)}
+            </p>
           </div>
           <a
             href={analysis.source_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded flex items-center"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-3 py-1.5 rounded text-sm flex items-center"
           >
-            View Original Document <span className="ml-1">↗️</span>
+            View Original <span className="ml-1">↗️</span>
           </a>
         </div>
       </div>

@@ -225,6 +225,15 @@ function getSeverityClasses(severity: "high" | "medium" | "low" | "none"): {
   }
 }
 
+// Format date in a way that's consistent between server and client
+function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+    2,
+    "0"
+  )}-${String(date.getDate()).padStart(2, "0")}`;
+}
+
 export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
   // Parse risks from JSON string if needed
   const risks =
@@ -238,61 +247,63 @@ export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
 
   return (
     <Link href={`/document/${analysis.id}`} className="block group">
-      <Card className="overflow-hidden h-full transition-all duration-300 border border-muted dark:border-muted group-hover:border-muted dark:group-hover:border-muted group-hover:shadow-md group-hover:shadow-muted/50 dark:group-hover:shadow-black/30">
+      <Card className="overflow-hidden h-full transition-all duration-300 border border-muted dark:border-muted group-hover:border-muted dark:group-hover:border-muted group-hover:shadow-sm">
         <CardContent className="p-0">
           {/* Card Header Section */}
           <div className="relative overflow-hidden">
             {/* Service Brand Bar - Visual Indicator */}
-            <div className={`h-1.5 w-full ${ratingDisplay.color}`}></div>
+            <div className={`h-1 w-full ${ratingDisplay.color}`}></div>
 
             {/* Card Content */}
-            <div className="p-5">
-              <h3 className="font-bold text-lg text-foreground dark:text-foreground">
+            <div className="p-4">
+              <h3 className="font-semibold text-base text-foreground dark:text-foreground">
                 {analysis.service_name}
               </h3>
 
               {/* Document type badge */}
-              <div className="mt-1.5 mb-3">
+              <div className="mt-1 mb-2">
                 <span className="bg-muted text-foreground dark:bg-muted dark:text-foreground text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded flex items-center">
                   <span className="mr-1">{documentBadge.label}</span>
                   {analysis.ai_generated && (
-                    <span className="ml-1.5 text-xs">• AI Generated</span>
+                    <span className="ml-1 text-[10px]">• AI</span>
                   )}
                 </span>
               </div>
 
               {/* Summary */}
-              <p className="text-sm text-foreground dark:text-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
+              <p className="text-xs text-foreground dark:text-foreground line-clamp-2 mb-3 min-h-[2rem]">
                 {analysis.summary}
               </p>
 
               {/* Rating Bar */}
-              <div className="flex justify-between items-center text-xs text-foreground dark:text-foreground mb-1.5">
+              <div className="flex justify-between items-center text-xs text-foreground dark:text-foreground mb-1">
                 <div>
-                  <span className="font-semibold text-foreground dark:text-foreground">
+                  <span className="font-medium text-foreground dark:text-foreground text-xs">
                     {ratingDisplay.label}
                   </span>
-                  <span className="ml-1.5 text-xs">({analysis.rating}/10)</span>
+                  <span className="ml-1 text-[10px]">
+                    ({analysis.rating}/10)
+                  </span>
                 </div>
               </div>
 
-              <div className="h-1.5 w-full bg-muted dark:bg-muted rounded-full overflow-hidden">
+              <div className="h-1 w-full bg-muted dark:bg-muted rounded-full overflow-hidden">
                 <div
                   className={`h-full ${ratingDisplay.color} ${ratingDisplay.barWidthClass}`}
                 ></div>
               </div>
 
               {/* Risks Section */}
-              <div className="mt-4 space-y-2">
+              <div className="mt-3 space-y-1.5">
                 {processedRisks.map((risk, index) => {
                   const severityClasses = getSeverityClasses(risk.severity);
                   return (
                     <div key={index} className="flex items-center">
                       <div
-                        className={`w-2 h-2 rounded-full mr-2 ${severityClasses.dotColor}`}
+                        className={`w-1.5 h-1.5 rounded-full mr-1.5 ${severityClasses.dotColor}`}
                       ></div>
                       <span
-                        className={`text-xs font-medium ${severityClasses.textColor}`}
+                        className={`text-[10px] font-medium ${severityClasses.textColor}`}
                       >
                         {risk.name}: {risk.value}
                       </span>
@@ -303,7 +314,7 @@ export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
 
               {/* Source Link */}
               {analysis.source_url && (
-                <div className="mt-3">
+                <div className="mt-2">
                   <button
                     onClick={(e) => {
                       e.preventDefault();
@@ -314,12 +325,12 @@ export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
                         "noopener,noreferrer"
                       );
                     }}
-                    className="text-xs font-medium text-foreground dark:text-foreground hover:text-foreground dark:hover:text-foreground cursor-pointer flex items-center"
+                    className="text-[10px] font-medium text-foreground dark:text-foreground hover:text-foreground dark:hover:text-foreground cursor-pointer flex items-center"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      width="12"
-                      height="12"
+                      width="10"
+                      height="10"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -340,17 +351,17 @@ export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
           </div>
 
           {/* Card Footer */}
-          <div className="px-5 py-3 border-t border-muted dark:border-muted bg-muted dark:bg-muted flex justify-between items-center">
+          <div className="px-4 py-2 border-t border-muted dark:border-muted bg-muted dark:bg-muted flex justify-between items-center">
             <div>
               <time
                 dateTime={analysis.created_at}
-                className="text-xs text-muted-foreground"
+                className="text-[10px] text-muted-foreground"
               >
-                {new Date(analysis.created_at).toLocaleDateString()}
+                {formatDate(analysis.created_at)}
               </time>
             </div>
             <div>
-              <span className="text-xs text-muted-foreground">
+              <span className="text-[10px] text-muted-foreground">
                 View details →
               </span>
             </div>

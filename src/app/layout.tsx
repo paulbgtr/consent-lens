@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Chivo } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 
-const inter = Inter({ subsets: ["latin"] });
+const chivo = Chivo({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Consent Lens | Simplified Terms & Privacy Policies",
@@ -18,20 +18,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="min-h-screen flex flex-col">
-          <header className="bg-card shadow-sm">
-            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <body className={chivo.className}>
+        <div className="min-h-screen flex flex-col max-w-7xl mx-auto">
+          <header className="bg-card shadow-sm px-4 sm:px-6">
+            <div className="py-3 flex justify-between items-center">
               <Link href="/" className="flex items-center">
-                <span className="text-2xl mr-2">🔍</span>
-                <span className="font-bold text-xl">Consent Lens</span>
+                <span className="text-xl mr-1.5">🔍</span>
+                <span className="font-bold text-lg">Consent Lens</span>
               </Link>
-              <nav className="space-x-6">
-                <Link href="/" className="hover:underline">
-                  Home
-                </Link>
-                <Link href="#" className="hover:underline">
-                  About
+              <nav className="space-x-5">
+                <Link href="/why" className="hover:underline text-sm">
+                  why?
                 </Link>
               </nav>
             </div>
@@ -39,11 +36,13 @@ export default function RootLayout({
 
           <div className="flex-1">{children}</div>
 
-          <footer className="bg-card shadow-inner mt-10 py-6">
-            <div className="container mx-auto px-4 text-center text-sm">
+          <footer className="bg-card shadow-inner mt-8 py-4 px-4 sm:px-6">
+            <div className="text-center text-xs">
               <p>
-                © {new Date().getFullYear()} Consent Lens. This is a demo
-                project.
+                © {new Date().getFullYear()} Consent Lens. Built with ❤️ by{" "}
+                <Link href="https://paulbg.dev" className="hover:underline">
+                  paulbg
+                </Link>
               </p>
             </div>
           </footer>
