@@ -2,15 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-  CardAction,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 type RiskLevel = "yes" | "no" | "passive" | "limited" | string;
 
@@ -33,29 +25,204 @@ interface Analysis {
   created_at: string;
 }
 
-function getRatingColor(rating: number): string {
-  if (rating >= 7) return "bg-green-100 text-green-800";
-  if (rating >= 4) return "bg-yellow-100 text-yellow-800";
-  return "bg-red-100 text-red-800";
-}
-
-function getDocumentTypeDisplay(type: string): string {
-  const types: Record<string, string> = {
-    tos: "Terms of Service",
-    privacy: "Privacy Policy",
-    cookie: "Cookie Policy",
-    other: "Other Document",
+// Get document type badge design
+function getDocumentBadge(type: string): { label: string; className: string } {
+  const types: Record<string, { label: string; className: string }> = {
+    tos: {
+      label: "ToS",
+      className: "bg-muted text-foreground dark:bg-muted dark:text-foreground",
+    },
+    privacy: {
+      label: "Privacy",
+      className: "bg-muted text-foreground dark:bg-muted dark:text-foreground",
+    },
+    cookie: {
+      label: "Cookies",
+      className: "bg-muted text-foreground dark:bg-muted dark:text-foreground",
+    },
+    other: {
+      label: "Other",
+      className: "bg-muted text-foreground dark:bg-muted dark:text-foreground",
+    },
   };
-  return types[type] || "Document";
+  return types[type] || types.other;
 }
 
-// Format date in a way that's consistent between server and client
-function formatDate(dateString: string): string {
-  const date = new Date(dateString);
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
-    2,
-    "0"
-  )}-${String(date.getDate()).padStart(2, "0")}`;
+// Get top risks with simplified display values
+function getProcessedRisks(risks: Record<string, string>): {
+  name: string;
+  value: string;
+  severity: "high" | "medium" | "low" | "none";
+}[] {
+  // Define risk mappings for display
+  const riskMappings: Record<
+    string,
+    {
+      displayName: string;
+      severityMap: Record<string, "high" | "medium" | "low" | "none">;
+    }
+  > = {
+    ads: {
+      displayName: "Advertising",
+      severityMap: {
+        yes: "high",
+        no: "none",
+        limited: "medium",
+        passive: "low",
+      },
+    },
+    third_parties: {
+      displayName: "3rd Party Sharing",
+      severityMap: {
+        yes: "high",
+        no: "none",
+        limited: "medium",
+        passive: "low",
+      },
+    },
+    location_tracking: {
+      displayName: "Location Tracking",
+      severityMap: {
+        yes: "high",
+        no: "none",
+        limited: "medium",
+        passive: "low",
+      },
+    },
+    data_collection: {
+      displayName: "Data Collection",
+      severityMap: {
+        yes: "high",
+        no: "none",
+        limited: "medium",
+        passive: "low",
+      },
+    },
+    data_sharing: {
+      displayName: "Data Sharing",
+      severityMap: {
+        yes: "high",
+        no: "none",
+        limited: "medium",
+        passive: "low",
+      },
+    },
+  };
+
+  // Priority order for risks
+  const priorityOrder = [
+    "ads",
+    "third_parties",
+    "location_tracking",
+    "data_collection",
+    "data_sharing",
+  ];
+
+  // Process and sort risks
+  return Object.entries(risks)
+    .map(([key, value]) => {
+      const mapping = riskMappings[key] || {
+        displayName: key.replace(/_/g, " "),
+        severityMap: {
+          yes: "high",
+          no: "none",
+          limited: "medium",
+          passive: "low",
+        },
+      };
+
+      return {
+        name: mapping.displayName,
+        value: String(value),
+        severity: mapping.severityMap[String(value)] || "medium",
+      };
+    })
+    .sort((a, b) => {
+      // Show high severity risks first
+      if (a.severity === "high" && b.severity !== "high") return -1;
+      if (a.severity !== "high" && b.severity === "high") return 1;
+
+      // Then follow priority order
+      const indexA = priorityOrder.indexOf(
+        a.name.toLowerCase().replace(/\s/g, "_")
+      );
+      const indexB = priorityOrder.indexOf(
+        b.name.toLowerCase().replace(/\s/g, "_")
+      );
+
+      if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+
+      return 0;
+    })
+    .slice(0, 3); // Only top 3 risks
+}
+
+// Get rating display details
+function getRatingDisplay(rating: number): {
+  color: string;
+  label: string;
+  barWidthClass: string;
+} {
+  if (rating >= 8)
+    return {
+      color: "bg-foreground",
+      label: "Good",
+      barWidthClass: "w-full",
+    };
+  if (rating >= 6)
+    return {
+      color: "bg-foreground",
+      label: "Acceptable",
+      barWidthClass: "w-3/4",
+    };
+  if (rating >= 4)
+    return {
+      color: "bg-foreground",
+      label: "Concerning",
+      barWidthClass: "w-1/2",
+    };
+  if (rating >= 2)
+    return {
+      color: "bg-foreground",
+      label: "Poor",
+      barWidthClass: "w-1/4",
+    };
+  return {
+    color: "bg-foreground",
+    label: "Risky",
+    barWidthClass: "w-[10%]",
+  };
+}
+
+// Get severity indicator classes
+function getSeverityClasses(severity: "high" | "medium" | "low" | "none"): {
+  dotColor: string;
+  textColor: string;
+} {
+  switch (severity) {
+    case "high":
+      return {
+        dotColor: "bg-foreground",
+        textColor: "text-foreground",
+      };
+    case "medium":
+      return {
+        dotColor: "bg-foreground",
+        textColor: "text-foreground",
+      };
+    case "low":
+      return {
+        dotColor: "bg-foreground",
+        textColor: "text-foreground",
+      };
+    case "none":
+      return {
+        dotColor: "bg-foreground",
+        textColor: "text-foreground",
+      };
+  }
 }
 
 export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
@@ -65,73 +232,130 @@ export default function AnalysisCard({ analysis }: { analysis: Analysis }) {
       ? JSON.parse(analysis.risks)
       : analysis.risks || {};
 
+  const processedRisks = getProcessedRisks(risks);
+  const documentBadge = getDocumentBadge(analysis.document_type);
+  const ratingDisplay = getRatingDisplay(analysis.rating);
+
   return (
-    <Link href={`/document/${analysis.id}`} className="block">
-      <Card className="h-full hover:shadow-md transition-shadow duration-300">
-        <CardHeader>
-          <CardTitle className="text-xl text-gray-800">
-            {analysis.service_name}
-          </CardTitle>
-          <CardDescription className="flex flex-wrap gap-2 mt-2">
-            <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
-              {getDocumentTypeDisplay(analysis.document_type)}
-            </span>
-            {analysis.ai_generated && (
-              <span className="inline-flex items-center text-xs text-gray-500">
-                <span className="mr-1">🤖</span>
-                <span>AI-generated</span>
-              </span>
-            )}
-          </CardDescription>
-          <CardAction>
-            <span
-              className={`text-xs font-semibold px-2 py-1 rounded-full ${getRatingColor(
-                analysis.rating
-              )}`}
-            >
-              {analysis.rating}/10
-            </span>
-          </CardAction>
-        </CardHeader>
+    <Link href={`/document/${analysis.id}`} className="block group">
+      <Card className="overflow-hidden h-full transition-all duration-300 border border-muted dark:border-muted group-hover:border-muted dark:group-hover:border-muted group-hover:shadow-md group-hover:shadow-muted/50 dark:group-hover:shadow-black/30">
+        <CardContent className="p-0">
+          {/* Card Header Section */}
+          <div className="relative overflow-hidden">
+            {/* Service Brand Bar - Visual Indicator */}
+            <div className={`h-1.5 w-full ${ratingDisplay.color}`}></div>
 
-        <CardContent>
-          <p className="text-gray-700 mb-4 line-clamp-3">{analysis.summary}</p>
+            {/* Card Content */}
+            <div className="p-5">
+              <h3 className="font-bold text-lg text-foreground dark:text-foreground">
+                {analysis.service_name}
+              </h3>
 
-          <div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">
-              Key Risks:
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {Object.entries(risks).map(([key, value]) => (
-                <span
-                  key={key}
-                  className={`text-xs px-2 py-1 rounded-full ${
-                    value === "yes"
-                      ? "bg-red-100 text-red-800"
-                      : value === "no"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                  }`}
-                >
-                  {key.replace(/_/g, " ")}: {String(value)}
+              {/* Document type badge */}
+              <div className="mt-1.5 mb-3">
+                <span className="bg-muted text-foreground dark:bg-muted dark:text-foreground text-[10px] uppercase tracking-wider font-medium px-1.5 py-0.5 rounded flex items-center">
+                  <span className="mr-1">{documentBadge.label}</span>
+                  {analysis.ai_generated && (
+                    <span className="ml-1.5 text-xs">• AI Generated</span>
+                  )}
                 </span>
-              ))}
+              </div>
+
+              {/* Summary */}
+              <p className="text-sm text-foreground dark:text-foreground line-clamp-2 mb-4 min-h-[2.5rem]">
+                {analysis.summary}
+              </p>
+
+              {/* Rating Bar */}
+              <div className="flex justify-between items-center text-xs text-foreground dark:text-foreground mb-1.5">
+                <div>
+                  <span className="font-semibold text-foreground dark:text-foreground">
+                    {ratingDisplay.label}
+                  </span>
+                  <span className="ml-1.5 text-xs">({analysis.rating}/10)</span>
+                </div>
+              </div>
+
+              <div className="h-1.5 w-full bg-muted dark:bg-muted rounded-full overflow-hidden">
+                <div
+                  className={`h-full ${ratingDisplay.color} ${ratingDisplay.barWidthClass}`}
+                ></div>
+              </div>
+
+              {/* Risks Section */}
+              <div className="mt-4 space-y-2">
+                {processedRisks.map((risk, index) => {
+                  const severityClasses = getSeverityClasses(risk.severity);
+                  return (
+                    <div key={index} className="flex items-center">
+                      <div
+                        className={`w-2 h-2 rounded-full mr-2 ${severityClasses.dotColor}`}
+                      ></div>
+                      <span
+                        className={`text-xs font-medium ${severityClasses.textColor}`}
+                      >
+                        {risk.name}: {risk.value}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Source Link */}
+              {analysis.source_url && (
+                <div className="mt-3">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      window.open(
+                        analysis.source_url,
+                        "_blank",
+                        "noopener,noreferrer"
+                      );
+                    }}
+                    className="text-xs font-medium text-foreground dark:text-foreground hover:text-foreground dark:hover:text-foreground cursor-pointer flex items-center"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="12"
+                      height="12"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      className="mr-1"
+                    >
+                      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                      <polyline points="15 3 21 3 21 9"></polyline>
+                      <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Source
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Card Footer */}
+          <div className="px-5 py-3 border-t border-muted dark:border-muted bg-muted dark:bg-muted flex justify-between items-center">
+            <div>
+              <time
+                dateTime={analysis.created_at}
+                className="text-xs text-muted-foreground"
+              >
+                {new Date(analysis.created_at).toLocaleDateString()}
+              </time>
+            </div>
+            <div>
+              <span className="text-xs text-muted-foreground">
+                View details →
+              </span>
             </div>
           </div>
         </CardContent>
-
-        <CardFooter className="justify-between text-sm text-gray-500 border-t">
-          <span>{formatDate(analysis.created_at)}</span>
-          <div
-            onClick={(e) => {
-              e.preventDefault();
-              window.open(analysis.source_url, "_blank", "noopener,noreferrer");
-            }}
-            className="flex items-center text-blue-600 hover:text-blue-800 cursor-pointer"
-          >
-            Source <span className="ml-1">↗️</span>
-          </div>
-        </CardFooter>
       </Card>
     </Link>
   );
