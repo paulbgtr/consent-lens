@@ -7,14 +7,6 @@ export default async function Home() {
 
   return (
     <main className="px-4 sm:px-6 py-6">
-      <div className="mb-6 text-center">
-        <h1 className="text-3xl font-bold mb-2">Consent Lens 🔍</h1>
-        <p className="text-base max-w-2xl mx-auto">
-          We read the fine print so you don't have to. Browse simplified,
-          human-readable summaries of Terms of Service and Privacy Policies.
-        </p>
-      </div>
-
       <div className="bg-muted p-4 rounded-lg mb-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-3">
           <div>
